@@ -84,6 +84,19 @@ void fillRandomArray(Array* currentArray, int size, int maxKey)
 		currentArray[cell].key = random(maxKey);
 	}
 }
+
+void fillDigitRandom(Array* currentArray, int size, int maxDigit)
+{
+	int maxNumb;
+	if (maxDigit == 1) { maxNumb = 9; }
+	else if (maxDigit == 2) { maxNumb = 99; }
+	else if (maxDigit == 3) { maxNumb = 999; }
+	else maxNumb = 9999; 
+	for (int cell = 0; cell < size; cell++)
+	{
+		currentArray[cell].key = random(maxNumb);
+	}
+}
 void fillSortedArray(Array* currentArray, int size)
 {
 	for (int cell = 0; cell < size; cell++) 
@@ -160,9 +173,10 @@ void generalFeedSort(ListItem* auxArray, Array* currentArray, int& countExchange
 	}
 }
 
-void radixSort(Array* currentArray, ListItem* auxArray, int k, int size)
+void radixSort(Array* currentArray, int& countExchanges, int k, int size)
 {
 	ListItem* radix = new ListItem[10];
+	ListItem* pCurrent;
 
 	int tempKey;
 
@@ -174,7 +188,6 @@ void radixSort(Array* currentArray, ListItem* auxArray, int k, int size)
 		}
 		for (int m = 0; m < size; m++)
 		{
-			
 			if (i == 0)
 			{
 				tempKey = currentArray[m].key % 10;
@@ -192,10 +205,19 @@ void radixSort(Array* currentArray, ListItem* auxArray, int k, int size)
 				tempKey = currentArray[m].key % 10000 / 1000;
 			}
 			addItem(&radix[tempKey], currentArray[m].key);
+			countExchanges++;
 		}
+		int steps = 0;
 		for (int r = 0; r < 10; r++)
 		{
-			auxArray[r] = radix[r];
+			pCurrent = radix[r].next;
+			while (pCurrent != nullptr)
+			{
+				currentArray[steps].key = pCurrent->data;
+				pCurrent = pCurrent->next;
+				steps++;
+				countExchanges++;
+			}
 		}
 	}
 }
@@ -303,14 +325,13 @@ void caseRadixSort()
 
 	int countCompares{ 0 }, countExchanges{ 0 };
 	Array* mainArray = new Array[size];
-	fillRandomArray(mainArray, size, size );
-	ListItem* auxArray = new ListItem[10];
-	for (int cell = 0; cell < 10 ; cell++)
-	{
-		auxArray[cell].next = nullptr;
-	}
-	radixSort(mainArray, auxArray, digit, size);
-	showInfoGeneralFeed(mainArray, auxArray, countCompares, countExchanges, size, 10);
+	fillDigitRandom(mainArray, size, digit);
+	Array* auxArray = new Array[size];
+	duplicateArray(mainArray, auxArray, size);
+	radixSort(auxArray, countExchanges, digit, size);
+	showInfo(mainArray, auxArray, countCompares, countExchanges, size);
+	clearMemory(mainArray, size);
+	clearMemory(auxArray, size);
 }
 
 void userInterface()
