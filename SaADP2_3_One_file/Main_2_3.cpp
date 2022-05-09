@@ -21,7 +21,7 @@ enum sorting
 };
 enum userInterface
 {
-	ShowMenu, SimpleFeedSort, FeedSort, GeneralFeedSort, Exit,
+	ShowMenu, SimpleFeedSort, FeedSort, GeneralFeedSort, RadixSort, Exit,
 	LineWidth = 20
 };
 
@@ -160,6 +160,45 @@ void generalFeedSort(ListItem* auxArray, Array* currentArray, int& countExchange
 	}
 }
 
+void radixSort(Array* currentArray, ListItem* auxArray, int k, int size)
+{
+	ListItem* radix = new ListItem[10];
+
+	int tempKey;
+
+	for (int i = 0; i < k; i++)
+	{
+		for (int j = 0; j < 10; j++)
+		{
+			radix[j].next = nullptr;
+		}
+		for (int m = 0; m < size; m++)
+		{
+			
+			if (i == 0)
+			{
+				tempKey = currentArray[m].key % 10;
+			}
+			else if (i == 1)
+			{
+				tempKey = currentArray[m].key % 100 / 10;
+			}
+			else if (i == 2)
+			{
+				tempKey = currentArray[m].key % 1000 / 100;
+			}
+			else if (i == 3)
+			{
+				tempKey = currentArray[m].key % 10000 / 1000;
+			}
+			addItem(&radix[tempKey], currentArray[m].key);
+		}
+		for (int r = 0; r < 10; r++)
+		{
+			auxArray[r] = radix[r];
+		}
+	}
+}
 /*   INTERFACE METHODS   */
 
 int input()
@@ -187,7 +226,8 @@ void printMenu()
 		<< "\n1. Simple feed sort."
 		<< "\n2. Feed sort."
 		<< "\n3. General feed sort."
-		<< "\n4. Exit." << endl;
+		<< "\n4. Radix sort."
+		<< "\n5. Exit." << endl;
 }
 
 void showInfo(Array* mainArray, Array* auxArray, int countCompares, int countExchanges, int size)
@@ -255,6 +295,24 @@ void caseGeneralFeedSort()
 	clearMemory(mainArray, size);
 	clearMemoryList(auxArray, maxKey );
 }
+
+void caseRadixSort()
+{
+	cout << "   Enter the maximum array size (> 0, < 10 000)\n"; int size = sizeInput(MinSize, MaxSize);
+	cout << "   Enter the maximum digit of the number (1 - 4)\n"; int digit = sizeInput(1, 4);
+
+	int countCompares{ 0 }, countExchanges{ 0 };
+	Array* mainArray = new Array[size];
+	fillRandomArray(mainArray, size, size );
+	ListItem* auxArray = new ListItem[10];
+	for (int cell = 0; cell < 10 ; cell++)
+	{
+		auxArray[cell].next = nullptr;
+	}
+	radixSort(mainArray, auxArray, digit, size);
+	showInfoGeneralFeed(mainArray, auxArray, countCompares, countExchanges, size, 10);
+}
+
 void userInterface()
 {
 	bool stop = false; printMenu();
@@ -268,6 +326,7 @@ void userInterface()
 		case SimpleFeedSort:  { caseSimpleFeedSort(); break; }
 		case FeedSort:        { caseFeedSort(); break; }
 		case GeneralFeedSort: { caseGeneralFeedSort(); break; }
+		case RadixSort:       { caseRadixSort(); break; }
 		case Exit:            { stop = true; break; }
 		default:                cout << "   There is no such menu item.\n\n"; break;
 		}
