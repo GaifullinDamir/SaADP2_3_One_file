@@ -216,7 +216,6 @@ void radixSort(Array* currentArray, int& countExchanges, int k, int size)
 				currentArray[steps].key = pCurrent->data;
 				pCurrent = pCurrent->next;
 				steps++;
-				countExchanges++;
 			}
 		}
 	}
