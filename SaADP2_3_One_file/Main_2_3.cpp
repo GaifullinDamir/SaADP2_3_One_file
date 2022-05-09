@@ -26,7 +26,7 @@ enum userInterface
 };
 
 /*   LIST   */
-void addItem(ListItem*& pHead, int data)
+void addItem(ListItem* pHead, int data)
 {
 	ListItem* pCurrent = pHead;
 	while (pCurrent->next != nullptr)
@@ -38,12 +38,12 @@ void addItem(ListItem*& pHead, int data)
 	pCurrent->next->next = nullptr;
 }
 
-void clearMemoryList(ListItem* currentArray[], int size)
+void clearMemoryList(ListItem* currentArray, int size)
 {
 	ListItem* pCurrent ;
 	for (int i = 0; i < size; i++)
 	{
-		pCurrent = currentArray[i]->next;
+		pCurrent = currentArray[i].next;
 		while (pCurrent != nullptr)
 		{
 			ListItem* pTemp = pCurrent;
@@ -55,18 +55,21 @@ void clearMemoryList(ListItem* currentArray[], int size)
 	delete[] currentArray; currentArray = nullptr;
 }
 
-void showArrayOfList(ListItem* currentArray[], int size)
+void showArrayOfList(ListItem* currentArray, int size)
 {
-	ListItem* pCurrent; int steps;
+	ListItem* pCurrent; int steps = 0;
 	for (int i = 0; i < size; i++)
 	{
-		steps = 1;
-		pCurrent = currentArray[i]->next;
+		pCurrent = currentArray[i].next;
 		while (pCurrent != nullptr)
 		{
-			if (steps % LineWidth == 0) { cout << "\n"; }
-			cout << pCurrent->data << "   ";
+			if (steps % LineWidth == 0) 
+			{
+				cout << "\n";
+			}
+			cout << pCurrent->data << " ";
 			pCurrent = pCurrent->next;
+			steps++;
 		}
 	}
 }
@@ -148,11 +151,11 @@ void feedSort(Array* mainArray, Array* auxArray, int& countExchanges, int size)
 	}
 }
 
-void generalFeedSort(ListItem* auxArray[], Array* currentArray, int& countExchanges, int size)
+void generalFeedSort(ListItem* auxArray, Array* currentArray, int& countExchanges, int size)
 {	
 	for (int i = 0; i < size; i++)
 	{
-		addItem(auxArray[currentArray[i].key], currentArray[i].key);
+		addItem(&auxArray[currentArray[i].key], currentArray[i].key);
 		countExchanges++;
 	}
 }
@@ -172,7 +175,7 @@ int input()
 
 int sizeInput(int minValue, int maxValue)
 {
-	int value = 0;
+	int value = -1;
 	while (value < minValue || value > maxValue) { cout << "   Enter: "; value = input(); }
 	return value;
 }
@@ -183,6 +186,7 @@ void printMenu()
 	cout
 		<< "\n1. Simple feed sort."
 		<< "\n2. Feed sort."
+		<< "\n3. General feed sort."
 		<< "\n4. Exit." << endl;
 }
 
@@ -195,12 +199,12 @@ void showInfo(Array* mainArray, Array* auxArray, int countCompares, int countExc
 	cout << "\n   Number of comparisons: " << countCompares << "\n\n   Number of exchanges: " << countExchanges << "\n\n";
 }
 
-void showInfoGeneralFeed(Array* mainArray, ListItem* auxArray, int countCompares, int countExchanges, int size)
+void showInfoGeneralFeed(Array* mainArray, ListItem* auxArray, int countCompares, int countExchanges, int size, int maxKey)
 {
 	cout << "\n   Before sorting:\n   ";
 	show(mainArray, size);
 	cout << "\n\n   After sorting:\n   ";
-	showArrayOfList(&auxArray, size);
+	showArrayOfList(auxArray, maxKey + 1);
 	cout << "\n   Number of comparisons: " << countCompares << "\n\n   Number of exchanges: " << countExchanges << "\n\n";
 }
 
@@ -241,15 +245,15 @@ void caseGeneralFeedSort()
 	Array* mainArray = new Array[size];
 	fillRandomArray(mainArray, size, maxKey);
 
-	ListItem* auxArray = new ListItem[MaxKey];
-	for (int cell = 0; cell < maxKey; cell++)
+	ListItem* auxArray = new ListItem[maxKey + 1];
+	for (int cell = 0; cell < maxKey + 1; cell++)
 	{
 		auxArray[cell].next = nullptr;
 	}
-	generalFeedSort(&auxArray, mainArray, countExchanges, size);
-	showInfoGeneralFeed(mainArray, auxArray, countCompares, countExchanges, size);
+	generalFeedSort(auxArray, mainArray, countExchanges, size);
+	showInfoGeneralFeed(mainArray, auxArray, countCompares, countExchanges, size, maxKey);
 	clearMemory(mainArray, size);
-	clearMemoryList(&auxArray, maxKey);
+	clearMemoryList(auxArray, maxKey );
 }
 void userInterface()
 {
